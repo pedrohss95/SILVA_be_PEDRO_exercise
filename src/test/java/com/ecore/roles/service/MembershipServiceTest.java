@@ -5,7 +5,7 @@ import com.ecore.roles.exception.ResourceExistsException;
 import com.ecore.roles.model.Membership;
 import com.ecore.roles.repository.MembershipRepository;
 import com.ecore.roles.repository.RoleRepository;
-import com.ecore.roles.service.impl.MembershipsServiceImpl;
+import com.ecore.roles.service.impl.MembershipServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,18 +22,18 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class MembershipsServiceTest {
+class MembershipServiceTest {
 
     @InjectMocks
-    private MembershipsServiceImpl membershipsService;
+    private MembershipServiceImpl membershipsService;
     @Mock
     private MembershipRepository membershipRepository;
     @Mock
     private RoleRepository roleRepository;
     @Mock
-    private UsersService usersService;
+    private UserService userService;
     @Mock
-    private TeamsService teamsService;
+    private TeamService teamService;
 
     @Test
     public void shouldCreateMembership() {
@@ -47,7 +47,7 @@ class MembershipsServiceTest {
                 .save(expectedMembership))
                         .thenReturn(expectedMembership);
 
-        when(teamsService.getTeam(expectedMembership.getTeamId()))
+        when(teamService.getTeamById(expectedMembership.getTeamId()))
                 .thenReturn(ORDINARY_CORAL_LYNX_TEAM(), ORDINARY_CORAL_LYNX_TEAM());
 
         Membership actualMembership = membershipsService.createMembership(expectedMembership);
@@ -75,8 +75,8 @@ class MembershipsServiceTest {
 
         assertEquals("Membership already exists", exception.getMessage());
         verify(roleRepository, times(0)).getById(any());
-        verify(usersService, times(0)).getUser(any());
-        verify(teamsService, times(0)).getTeam(any());
+        verify(userService, times(0)).getUserById(any());
+        verify(teamService, times(0)).getTeamById(any());
     }
 
     @Test
@@ -90,8 +90,8 @@ class MembershipsServiceTest {
         assertEquals("Invalid 'Role' object", exception.getMessage());
         verify(membershipRepository, times(0)).findByUserIdAndTeamId(any(), any());
         verify(roleRepository, times(0)).getById(any());
-        verify(usersService, times(0)).getUser(any());
-        verify(teamsService, times(0)).getTeam(any());
+        verify(userService, times(0)).getUserById(any());
+        verify(teamService, times(0)).getTeamById(any());
     }
 
     @Test

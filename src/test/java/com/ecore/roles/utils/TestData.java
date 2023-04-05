@@ -22,13 +22,15 @@ public class TestData {
 
     public static final UUID GIANNI_USER_UUID = UUID.fromString("fd282131-d8aa-4819-b0c8-d9e0bfb1b75c");
 
-    public static final String INVALID_UUID = "7676a4bf-adfe-415c-941b-1739af07039";
-
     public static final UUID ORDINARY_CORAL_LYNX_TEAM_UUID =
             UUID.fromString("7676a4bf-adfe-415c-941b-1739af07039b");
 
     public static final UUID DEFAULT_MEMBERSHIP_UUID =
             UUID.fromString("98de61a0-b9e3-11ec-8422-0242ac120002");
+
+    public static final String INVALID_UUID = "7676a4bf-adfe-415c-941b-1739af07039";
+
+    public static final String DEFAULT_ROLE_NAME = "Developer";
 
     public static Role DEVELOPER_ROLE() {
         return Role.builder()

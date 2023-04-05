@@ -15,8 +15,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
 import static com.ecore.roles.utils.MockUtils.mockGetTeamById;
-import static com.ecore.roles.utils.RestAssuredHelper.createMembership;
-import static com.ecore.roles.utils.RestAssuredHelper.getMemberships;
+import static com.ecore.roles.utils.RestAssuredHelper.*;
 import static com.ecore.roles.utils.TestData.*;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -145,11 +144,11 @@ public class MembershipsApiTests {
     }
 
     @Test
-    void shouldGetAllMemberships() {
+    void shouldGetAllMembershipsByRole() {
         createDefaultMembership();
         Membership expectedMembership = DEFAULT_MEMBERSHIP();
 
-        MembershipDto[] actualMemberships = getMemberships(expectedMembership.getRole().getId())
+        MembershipDto[] actualMemberships = getMembershipsByRole(expectedMembership.getRole().getId())
                 .statusCode(200)
                 .extract().as(MembershipDto[].class);
 
@@ -160,7 +159,7 @@ public class MembershipsApiTests {
 
     @Test
     void shouldGetAllMembershipsButReturnsEmptyList() {
-        MembershipDto[] actualMemberships = getMemberships(DEVELOPER_ROLE_UUID)
+        MembershipDto[] actualMemberships = getMembershipsByRole(DEVELOPER_ROLE_UUID)
                 .statusCode(200)
                 .extract().as(MembershipDto[].class);
 
@@ -169,7 +168,7 @@ public class MembershipsApiTests {
 
     @Test
     void shouldFailToGetAllMembershipsWhenRoleIdIsNull() {
-        getMemberships(null)
+        getMembershipsByRole(null)
                 .validate(400, "Bad Request");
     }
 
@@ -180,6 +179,28 @@ public class MembershipsApiTests {
         return createMembership(expectedMembership)
                 .statusCode(201)
                 .extract().as(MembershipDto.class);
+    }
+
+    @Test
+    void shouldGetAllMemberships() {
+        createDefaultMembership();
+        Membership expectedMembership = DEFAULT_MEMBERSHIP();
+
+        MembershipDto[] actualMemberships = getMemberships()
+                .statusCode(200)
+                .extract().as(MembershipDto[].class);
+        assertThat(actualMemberships.length).isEqualTo(1);
+        assertThat(actualMemberships[0].getId()).isNotNull();
+        assertThat(actualMemberships[0]).isEqualTo(MembershipDto.fromModel(expectedMembership));
+    }
+
+    @Test
+    void shouldGetAllMembershipsButReturnsEmptyListWhenNoMembershipsExist() {
+        MembershipDto[] actualMemberships = getMemberships()
+                .statusCode(200)
+                .extract().as(MembershipDto[].class);
+
+        assertThat(actualMemberships.length).isEqualTo(0);
     }
 
 }

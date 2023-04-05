@@ -8,8 +8,8 @@ import com.ecore.roles.model.Membership;
 import com.ecore.roles.model.Role;
 import com.ecore.roles.repository.MembershipRepository;
 import com.ecore.roles.repository.RoleRepository;
-import com.ecore.roles.service.MembershipsService;
-import com.ecore.roles.service.TeamsService;
+import com.ecore.roles.service.MembershipService;
+import com.ecore.roles.service.TeamService;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,20 +22,20 @@ import static java.util.Optional.ofNullable;
 
 @Log4j2
 @Service
-public class MembershipsServiceImpl implements MembershipsService {
+public class MembershipServiceImpl implements MembershipService {
 
     private final MembershipRepository membershipRepository;
     private final RoleRepository roleRepository;
-    private final TeamsService teamsService;
+    private final TeamService teamService;
 
     @Autowired
-    public MembershipsServiceImpl(
+    public MembershipServiceImpl(
             MembershipRepository membershipRepository,
             RoleRepository roleRepository,
-            TeamsService teamsService) {
+            TeamService teamService) {
         this.membershipRepository = membershipRepository;
         this.roleRepository = roleRepository;
-        this.teamsService = teamsService;
+        this.teamService = teamService;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class MembershipsServiceImpl implements MembershipsService {
             throw new ResourceExistsException(Membership.class);
         }
 
-        Team team = teamsService.getTeam(membership.getTeamId());
+        Team team = teamService.getTeamById(membership.getTeamId());
         if (team == null) {
             throw new ResourceNotFoundException(Team.class, membership.getTeamId());
         }

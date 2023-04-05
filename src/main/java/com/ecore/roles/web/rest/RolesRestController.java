@@ -1,7 +1,7 @@
 package com.ecore.roles.web.rest;
 
 import com.ecore.roles.model.Role;
-import com.ecore.roles.service.RolesService;
+import com.ecore.roles.service.RoleService;
 import com.ecore.roles.web.RolesApi;
 import com.ecore.roles.web.dto.RoleDto;
 import com.ecore.roles.web.dto.RoleSearchDto;
@@ -21,7 +21,7 @@ import static com.ecore.roles.web.dto.RoleDto.fromModel;
 @RequestMapping(value = "/v1/roles")
 public class RolesRestController implements RolesApi {
 
-    private final RolesService rolesService;
+    private final RoleService roleService;
 
     @Override
     @PostMapping(
@@ -31,7 +31,7 @@ public class RolesRestController implements RolesApi {
             @Valid @RequestBody RoleDto roleDto) {
         return ResponseEntity
                 .status(201)
-                .body(fromModel(rolesService.CreateRole(roleDto.toModel())));
+                .body(fromModel(roleService.saveRole(roleDto.toModel())));
     }
 
     @Override
@@ -39,7 +39,7 @@ public class RolesRestController implements RolesApi {
             produces = {"application/json"})
     public ResponseEntity<List<RoleDto>> getRoles() {
 
-        List<Role> getRoles = rolesService.GetRoles();
+        List<Role> getRoles = roleService.findAllRoles();
 
         List<RoleDto> roleDtoList = new ArrayList<>();
 
@@ -61,7 +61,7 @@ public class RolesRestController implements RolesApi {
             @PathVariable UUID roleId) {
         return ResponseEntity
                 .status(200)
-                .body(fromModel(rolesService.GetRole(roleId)));
+                .body(fromModel(roleService.getRole(roleId)));
     }
 
     @Override
@@ -74,7 +74,7 @@ public class RolesRestController implements RolesApi {
 
         return ResponseEntity
                 .status(200)
-                .body(fromModel(rolesService.getRoleFromMembershipsByUserAndTeam(userId, teamId)));
+                .body(fromModel(roleService.getRoleFromMembershipsByUserAndTeam(userId, teamId)));
     }
 
     @Override
@@ -83,7 +83,7 @@ public class RolesRestController implements RolesApi {
             produces = {"application/json"})
     public ResponseEntity<List<RoleDto>> getListOfRolesByUserIdAndTeamId(
             @Valid @RequestBody RoleSearchDto roleSearchDto) {
-        List<Role> roles = rolesService.getRolesListFromMembershipsByUserAndTeam(
+        List<Role> roles = roleService.getRolesListFromMembershipsByUserAndTeam(
                 roleSearchDto.getUserIdList(), roleSearchDto.getTeamIdList());
 
         List<RoleDto> roleDtoList = new ArrayList<>();

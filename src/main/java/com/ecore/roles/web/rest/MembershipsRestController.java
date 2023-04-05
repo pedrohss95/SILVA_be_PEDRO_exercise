@@ -1,7 +1,7 @@
 package com.ecore.roles.web.rest;
 
 import com.ecore.roles.model.Membership;
-import com.ecore.roles.service.MembershipsService;
+import com.ecore.roles.service.MembershipService;
 import com.ecore.roles.web.MembershipsApi;
 import com.ecore.roles.web.dto.MembershipDto;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import static com.ecore.roles.web.dto.MembershipDto.fromModel;
 @RequestMapping(value = "/v1/roles/memberships")
 public class MembershipsRestController implements MembershipsApi {
 
-    private final MembershipsService membershipsService;
+    private final MembershipService membershipService;
 
     @Override
     @PostMapping(
@@ -28,7 +28,7 @@ public class MembershipsRestController implements MembershipsApi {
             produces = {"application/json"})
     public ResponseEntity<MembershipDto> createMembership(
             @NotNull @Valid @RequestBody MembershipDto membershipDto) {
-        Membership membership = membershipsService.createMembership(membershipDto.toModel());
+        Membership membership = membershipService.createMembership(membershipDto.toModel());
         return ResponseEntity
                 .status(201)
                 .body(fromModel(membership));
@@ -41,7 +41,7 @@ public class MembershipsRestController implements MembershipsApi {
     public ResponseEntity<List<MembershipDto>> getMembershipsByRole(
             @RequestParam UUID roleId) {
 
-        List<Membership> memberships = membershipsService.getMembershipsByRole(roleId);
+        List<Membership> memberships = membershipService.getMembershipsByRole(roleId);
 
         List<MembershipDto> newMembershipDto = new ArrayList<>();
 
@@ -60,7 +60,7 @@ public class MembershipsRestController implements MembershipsApi {
             produces = {"application/json"})
     public ResponseEntity<List<MembershipDto>> getMemberships() {
 
-        List<Membership> memberships = membershipsService.getMemberships();
+        List<Membership> memberships = membershipService.getMemberships();
 
         List<MembershipDto> newMembershipDto = new ArrayList<>();
 

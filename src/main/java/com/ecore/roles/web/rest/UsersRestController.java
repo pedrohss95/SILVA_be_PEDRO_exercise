@@ -1,6 +1,6 @@
 package com.ecore.roles.web.rest;
 
-import com.ecore.roles.service.UsersService;
+import com.ecore.roles.service.UserService;
 import com.ecore.roles.web.UsersApi;
 import com.ecore.roles.web.dto.UserDto;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import static com.ecore.roles.web.dto.UserDto.fromModel;
 @RequestMapping(value = "/v1/users")
 public class UsersRestController implements UsersApi {
 
-    private final UsersService usersService;
+    private final UserService userService;
 
     @Override
     @PostMapping(
@@ -29,7 +29,7 @@ public class UsersRestController implements UsersApi {
     public ResponseEntity<List<UserDto>> getUsers() {
         return ResponseEntity
                 .status(200)
-                .body(usersService.getUsers().stream()
+                .body(userService.getAllUsers().stream()
                         .map(UserDto::fromModel)
                         .collect(Collectors.toList()));
     }
@@ -42,6 +42,6 @@ public class UsersRestController implements UsersApi {
             @PathVariable UUID userId) {
         return ResponseEntity
                 .status(200)
-                .body(fromModel(usersService.getUser(userId)));
+                .body(fromModel(userService.getUserById(userId)));
     }
 }

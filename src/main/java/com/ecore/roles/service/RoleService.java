@@ -6,13 +6,13 @@ import lombok.NonNull;
 import java.util.List;
 import java.util.UUID;
 
-public interface RolesService {
+public interface RoleService {
 
-    Role CreateRole(Role role);
+    Role saveRole(Role role);
 
-    Role GetRole(UUID id);
+    Role getRole(UUID roleId);
 
-    List<Role> GetRoles();
+    List<Role> findAllRoles();
 
     Role getRoleFromMembershipsByUserAndTeam(@NonNull UUID userId, @NonNull UUID teamId);
 

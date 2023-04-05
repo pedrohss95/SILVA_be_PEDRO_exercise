@@ -152,10 +152,10 @@ public class RolesApiTest {
 
     @Test
     void shouldGetRoleListByUserIdAndTeamId() {
-        Membership expectedMembership = DEFAULT_MEMBERSHIP();
+        RoleSearchDto roleSearchDto = ROLE_SEARCH_DTO();
         mockGetTeamById(mockServer, ORDINARY_CORAL_LYNX_TEAM_UUID, ORDINARY_CORAL_LYNX_TEAM());
 
-        RoleDto[] roles = getRoleListByUserIdAndTeamId(ROLE_SEARCH_DTO())
+        RoleDto[] roles = getRoleListByUserIdAndTeamId(roleSearchDto)
                 .extract().as(RoleDto[].class);
 
         assertThat(roles).contains(RoleDto.fromModel(DEVELOPER_ROLE()));
