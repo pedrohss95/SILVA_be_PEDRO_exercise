@@ -4,3 +4,4 @@
 # Idea config
 .idea
 .DS_Store
+target/
