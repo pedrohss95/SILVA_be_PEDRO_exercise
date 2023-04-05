@@ -1,5 +1,6 @@
 package com.ecore.roles.api;
 
+import com.ecore.roles.client.model.Team;
 import com.ecore.roles.model.Membership;
 import com.ecore.roles.model.Role;
 import com.ecore.roles.repository.MembershipRepository;
@@ -55,13 +56,13 @@ public class MembershipsApiTests {
     }
 
     @Test
-    void shouldFailToCreateRoleMembershipWhenBodyIsNull() {
+    void shouldFailToCreateMembershipWhenBodyIsNull() {
         createMembership(null)
                 .validate(400, "Bad Request");
     }
 
     @Test
-    void shouldFailToCreateRoleMembershipWhenRoleIsNull() {
+    void shouldFailToCreateMembershipWhenRoleIsNull() {
         Membership expectedMembership = DEFAULT_MEMBERSHIP();
         expectedMembership.setRole(null);
 
@@ -70,7 +71,7 @@ public class MembershipsApiTests {
     }
 
     @Test
-    void shouldFailToCreateRoleMembershipWhenRoleIdIsNull() {
+    void shouldFailToCreateMembershipWhenRoleIdIsNull() {
         Membership expectedMembership = DEFAULT_MEMBERSHIP();
         expectedMembership.setRole(Role.builder().build());
 
@@ -88,7 +89,7 @@ public class MembershipsApiTests {
     }
 
     @Test
-    void shouldFailToCreateRoleMembershipWhenTeamIdISNull() {
+    void shouldFailToCreateMembershipWhenTeamIdISNull() {
         Membership expectedMembership = DEFAULT_MEMBERSHIP();
         expectedMembership.setTeamId(null);
 
@@ -108,14 +109,16 @@ public class MembershipsApiTests {
     void shouldFailToCreateRoleMembershipWhenRoleDoesNotExist() {
         Membership expectedMembership = DEFAULT_MEMBERSHIP();
         expectedMembership.setRole(Role.builder().id(UUID_1).build());
+        mockGetTeamById(mockServer, expectedMembership.getTeamId(),
+                Team.builder().id(ORDINARY_CORAL_LYNX_TEAM_UUID).build());
 
         createMembership(expectedMembership)
                 .validate(404, format("Role %s not found", UUID_1));
     }
 
     @Test
-    void shouldFailToCreateRoleMembershipWhenTeamDoesNotExist() {
-        Membership expectedMembership = DEFAULT_MEMBERSHIP();
+    void shouldFailToCreateMembershipWhenTeamDoesNotExist() {
+        Membership expectedMembership = INVALID_MEMBERSHIP();
         mockGetTeamById(mockServer, expectedMembership.getTeamId(), null);
 
         createMembership(expectedMembership)
@@ -123,13 +126,22 @@ public class MembershipsApiTests {
     }
 
     @Test
-    void shouldFailToAssignRoleWhenMembershipIsInvalid() {
+    void shouldFailToCreateMembershipWhenTeamIsInvalid() {
         Membership expectedMembership = INVALID_MEMBERSHIP();
+        expectedMembership.setTeamId(null);
+        mockGetTeamById(mockServer, expectedMembership.getTeamId(), Team.builder().id(UUID_1).build());
+
+        createMembership(expectedMembership)
+                .validate(400, "Bad Request");
+    }
+
+    @Test
+    void shouldFailToCreateMembershipWhenMembershipIsInvalid() {
+        Membership expectedMembership = Membership.builder().build();
         mockGetTeamById(mockServer, expectedMembership.getTeamId(), ORDINARY_CORAL_LYNX_TEAM());
 
         createMembership(expectedMembership)
-                .validate(400,
-                        "Invalid 'Membership' object. The provided user doesn't belong to the provided team.");
+                .validate(400, "Bad Request");
     }
 
     @Test

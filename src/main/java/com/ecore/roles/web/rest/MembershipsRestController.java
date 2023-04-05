@@ -26,22 +26,41 @@ public class MembershipsRestController implements MembershipsApi {
     @PostMapping(
             consumes = {"application/json"},
             produces = {"application/json"})
-    public ResponseEntity<MembershipDto> assignRoleToMembership(
+    public ResponseEntity<MembershipDto> createMembership(
             @NotNull @Valid @RequestBody MembershipDto membershipDto) {
-        Membership membership = membershipsService.assignRoleToMembership(membershipDto.toModel());
+        Membership membership = membershipsService.createMembership(membershipDto.toModel());
         return ResponseEntity
-                .status(200)
+                .status(201)
                 .body(fromModel(membership));
     }
 
     @Override
-    @PostMapping(
+    @GetMapping(
             path = "/search",
             produces = {"application/json"})
-    public ResponseEntity<List<MembershipDto>> getMemberships(
+    public ResponseEntity<List<MembershipDto>> getMembershipsByRole(
             @RequestParam UUID roleId) {
 
-        List<Membership> memberships = membershipsService.getMemberships(roleId);
+        List<Membership> memberships = membershipsService.getMembershipsByRole(roleId);
+
+        List<MembershipDto> newMembershipDto = new ArrayList<>();
+
+        for (Membership membership : memberships) {
+            MembershipDto membershipDto = fromModel(membership);
+            newMembershipDto.add(membershipDto);
+        }
+
+        return ResponseEntity
+                .status(200)
+                .body(newMembershipDto);
+    }
+
+    @Override
+    @GetMapping(
+            produces = {"application/json"})
+    public ResponseEntity<List<MembershipDto>> getMemberships() {
+
+        List<Membership> memberships = membershipsService.getMemberships();
 
         List<MembershipDto> newMembershipDto = new ArrayList<>();
 

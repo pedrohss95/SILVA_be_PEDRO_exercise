@@ -5,6 +5,7 @@ import com.ecore.roles.model.Role;
 import com.ecore.roles.repository.RoleRepository;
 import com.ecore.roles.utils.RestAssuredHelper;
 import com.ecore.roles.web.dto.RoleDto;
+import com.ecore.roles.web.dto.RoleSearchDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +15,11 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.ecore.roles.utils.MockUtils.mockGetTeamById;
-import static com.ecore.roles.utils.RestAssuredHelper.createMembership;
-import static com.ecore.roles.utils.RestAssuredHelper.createRole;
-import static com.ecore.roles.utils.RestAssuredHelper.getRole;
-import static com.ecore.roles.utils.RestAssuredHelper.getRoles;
-import static com.ecore.roles.utils.RestAssuredHelper.sendRequest;
-import static com.ecore.roles.utils.TestData.DEFAULT_MEMBERSHIP;
-import static com.ecore.roles.utils.TestData.DEVELOPER_ROLE;
-import static com.ecore.roles.utils.TestData.DEVOPS_ROLE;
-import static com.ecore.roles.utils.TestData.GIANNI_USER_UUID;
-import static com.ecore.roles.utils.TestData.ORDINARY_CORAL_LYNX_TEAM;
-import static com.ecore.roles.utils.TestData.ORDINARY_CORAL_LYNX_TEAM_UUID;
-import static com.ecore.roles.utils.TestData.PRODUCT_OWNER_ROLE;
-import static com.ecore.roles.utils.TestData.TESTER_ROLE;
-import static com.ecore.roles.utils.TestData.UUID_1;
+import static com.ecore.roles.utils.RestAssuredHelper.*;
+import static com.ecore.roles.utils.TestData.*;
 import static io.restassured.RestAssured.when;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -133,30 +123,55 @@ public class RolesApiTest {
     void shouldGetRoleByUserIdAndTeamId() {
         Membership expectedMembership = DEFAULT_MEMBERSHIP();
         mockGetTeamById(mockServer, ORDINARY_CORAL_LYNX_TEAM_UUID, ORDINARY_CORAL_LYNX_TEAM());
-        createMembership(expectedMembership)
-                .statusCode(201);
 
-        getRole(expectedMembership.getUserId(), expectedMembership.getTeamId())
+        getRoleByUserIdAndTeamId(expectedMembership.getUserId(), expectedMembership.getTeamId())
                 .statusCode(200)
                 .body("name", equalTo(expectedMembership.getRole().getName()));
     }
 
     @Test
-    void shouldFailToGetRoleByUserIdAndTeamIdWhenMissingUserId() {
-        getRole(null, ORDINARY_CORAL_LYNX_TEAM_UUID)
-                .validate(400, "Bad Request");
+    void shouldFailToGetRoleByUserIdAndTeamIdWhenUserIdIsInvalid() {
+        getRoleByUserIdAndTeamId(UUID.fromString(INVALID_UUID), ORDINARY_CORAL_LYNX_TEAM_UUID)
+                .validate(404, format("Role %s %s not found", UUID.fromString(INVALID_UUID),
+                        ORDINARY_CORAL_LYNX_TEAM_UUID));
     }
 
     @Test
-    void shouldFailToGetRoleByUserIdAndTeamIdWhenMissingTeamId() {
-        getRole(GIANNI_USER_UUID, null)
-                .validate(400, "Bad Request");
+    void shouldFailToGetRoleByUserIdAndTeamIdWhenTeamIdIsInvalid() {
+        getRoleByUserIdAndTeamId(GIANNI_USER_UUID, UUID.fromString(INVALID_UUID))
+                .validate(404,
+                        format("Role %s %s not found", GIANNI_USER_UUID, UUID.fromString(INVALID_UUID)));
     }
 
     @Test
     void shouldFailToGetRoleByUserIdAndTeamIdWhenItDoesNotExist() {
         mockGetTeamById(mockServer, UUID_1, null);
-        getRole(GIANNI_USER_UUID, UUID_1)
-                .validate(404, format("Team %s not found", UUID_1));
+        getRoleByUserIdAndTeamId(GIANNI_USER_UUID, UUID_1)
+                .validate(404, format("Role %s %s not found", GIANNI_USER_UUID, UUID_1));
+    }
+
+    @Test
+    void shouldGetRoleListByUserIdAndTeamId() {
+        Membership expectedMembership = DEFAULT_MEMBERSHIP();
+        mockGetTeamById(mockServer, ORDINARY_CORAL_LYNX_TEAM_UUID, ORDINARY_CORAL_LYNX_TEAM());
+
+        RoleDto[] roles = getRoleListByUserIdAndTeamId(ROLE_SEARCH_DTO())
+                .extract().as(RoleDto[].class);
+
+        assertThat(roles).contains(RoleDto.fromModel(DEVELOPER_ROLE()));
+    }
+
+    @Test
+    void shouldFailToGetRoleListByUserIdAndTeamIdWhenUserIdIsInvalid() {
+        RoleSearchDto roleSearchDto = INVALID_ROLE_SEARCH_DTO();
+        Membership expectedMembership = DEFAULT_MEMBERSHIP();
+        mockGetTeamById(mockServer, ORDINARY_CORAL_LYNX_TEAM_UUID, ORDINARY_CORAL_LYNX_TEAM());
+        createMembership(expectedMembership)
+                .statusCode(201);
+
+        RoleDto[] roles = getRoleListByUserIdAndTeamId(roleSearchDto)
+                .extract().as(RoleDto[].class);
+
+        assertThat(roles).doesNotContain(RoleDto.fromModel(DEVELOPER_ROLE()));
     }
 }

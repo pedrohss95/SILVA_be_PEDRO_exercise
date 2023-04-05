@@ -4,6 +4,7 @@ import com.ecore.roles.client.model.Team;
 import com.ecore.roles.client.model.User;
 import com.ecore.roles.model.Membership;
 import com.ecore.roles.model.Role;
+import com.ecore.roles.web.dto.RoleSearchDto;
 import org.assertj.core.util.Lists;
 
 import java.util.UUID;
@@ -20,6 +21,8 @@ public class TestData {
     public static final UUID TESTER_ROLE_UUID = UUID.fromString("37969e22-26f3-11ec-9621-0242ac130002");
 
     public static final UUID GIANNI_USER_UUID = UUID.fromString("fd282131-d8aa-4819-b0c8-d9e0bfb1b75c");
+
+    public static final String INVALID_UUID = "7676a4bf-adfe-415c-941b-1739af07039";
 
     public static final UUID ORDINARY_CORAL_LYNX_TEAM_UUID =
             UUID.fromString("7676a4bf-adfe-415c-941b-1739af07039b");
@@ -48,6 +51,20 @@ public class TestData {
     public static Role DEVOPS_ROLE() {
         return Role.builder()
                 .name("DevOps").build();
+    }
+
+    public static RoleSearchDto ROLE_SEARCH_DTO() {
+        return RoleSearchDto.builder()
+                .userIdList(Lists.list(UUID_1, UUID_2, UUID_3, GIANNI_USER_UUID))
+                .teamIdList(Lists.list(UUID_4, ORDINARY_CORAL_LYNX_TEAM_UUID))
+                .build();
+    }
+
+    public static RoleSearchDto INVALID_ROLE_SEARCH_DTO() {
+        return RoleSearchDto.builder()
+                .userIdList(Lists.list(UUID_1, UUID_2, UUID.fromString(INVALID_UUID)))
+                .teamIdList(Lists.list(UUID_4))
+                .build();
     }
 
     public static Team ORDINARY_CORAL_LYNX_TEAM(boolean full) {
@@ -96,7 +113,7 @@ public class TestData {
                 .id(DEFAULT_MEMBERSHIP_UUID)
                 .role(DEVELOPER_ROLE())
                 .userId(UUID_4)
-                .teamId(ORDINARY_CORAL_LYNX_TEAM_UUID)
+                .teamId(UUID_1)
                 .build();
     }
 

@@ -19,11 +19,14 @@ public class UsersServiceImpl implements UsersService {
         this.usersClient = usersClient;
     }
 
+    @Override
     public User getUser(UUID id) {
         return usersClient.getUser(id).getBody();
     }
 
+    @Override
     public List<User> getUsers() {
         return usersClient.getUsers().getBody();
     }
+
 }
