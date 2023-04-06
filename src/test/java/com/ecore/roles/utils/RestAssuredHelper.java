@@ -4,6 +4,7 @@ import com.ecore.roles.model.Membership;
 import com.ecore.roles.model.Role;
 import com.ecore.roles.web.dto.MembershipDto;
 import com.ecore.roles.web.dto.RoleDto;
+import com.ecore.roles.web.dto.RoleSearchDto;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.response.ExtractableResponse;
@@ -52,12 +53,20 @@ public class RestAssuredHelper {
                 .then());
     }
 
-    public static EcoreValidatableResponse getRole(UUID userId, UUID teamId) {
+    public static EcoreValidatableResponse getRoleByUserIdAndTeamId(UUID userId, UUID teamId) {
         return sendRequest(given()
-                .queryParam("teamMemberId", userId)
-                .queryParam("teamId", teamId)
+                .pathParam("teamMemberId", userId)
+                .pathParam("teamId", teamId)
                 .when()
-                .get("/v1/roles/search")
+                .get("/v1/roles/{teamMemberId}/{teamId}")
+                .then());
+    }
+
+    public static EcoreValidatableResponse getRoleListByUserIdAndTeamId(RoleSearchDto roleSearchDto) {
+        return sendRequest(givenNullableBody(roleSearchDto)
+                .contentType(JSON)
+                .when()
+                .post("/v1/roles/search")
                 .then());
     }
 
@@ -69,7 +78,13 @@ public class RestAssuredHelper {
                 .then());
     }
 
-    public static EcoreValidatableResponse getMemberships(UUID roleId) {
+    public static EcoreValidatableResponse getMemberships() {
+        return sendRequest(when()
+                .get("/v1/roles/memberships")
+                .then());
+    }
+
+    public static EcoreValidatableResponse getMembershipsByRole(UUID roleId) {
         return sendRequest(given()
                 .queryParam("roleId", roleId)
                 .when()

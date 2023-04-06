@@ -1,6 +1,6 @@
 package com.ecore.roles.web.rest;
 
-import com.ecore.roles.service.TeamsService;
+import com.ecore.roles.service.TeamService;
 import com.ecore.roles.web.TeamsApi;
 import com.ecore.roles.web.dto.TeamDto;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import static com.ecore.roles.web.dto.TeamDto.fromModel;
 @RequestMapping(value = "/v1/teams")
 public class TeamsRestController implements TeamsApi {
 
-    private final TeamsService teamsService;
+    private final TeamService teamService;
 
     @Override
     @PostMapping(
@@ -29,7 +29,7 @@ public class TeamsRestController implements TeamsApi {
     public ResponseEntity<List<TeamDto>> getTeams() {
         return ResponseEntity
                 .status(200)
-                .body(teamsService.getTeams().stream()
+                .body(teamService.getAllTeams().stream()
                         .map(TeamDto::fromModel)
                         .collect(Collectors.toList()));
     }
@@ -42,7 +42,7 @@ public class TeamsRestController implements TeamsApi {
             @PathVariable UUID teamId) {
         return ResponseEntity
                 .status(200)
-                .body(fromModel(teamsService.getTeam(teamId)));
+                .body(fromModel(teamService.getTeamById(teamId)));
     }
 
 }
