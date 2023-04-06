@@ -72,7 +72,8 @@ public class RoleServiceImpl implements RoleService {
         List<Role> roleList = new ArrayList<>();
         for (Membership membership : memberships) {
             Role role = membership.getRole();
-            roleList.add(role);
+            if (!roleList.contains(role))
+                roleList.add(role);
         }
         return roleList;
     }
